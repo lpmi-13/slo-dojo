@@ -1,0 +1,13 @@
+#!/bin/bash
+
+psql << EOF
+CREATE DATABASE $DATABASE_NAME;
+
+CREATE USER $USER WITH PASSWORD '$USER_PASSWORD';
+
+ALTER ROLE $USER SET client_encoding TO 'utf8';
+ALTER ROLE $USER SET default_transaction_isolation TO 'read committed';
+ALTER ROLE $USER SET timezone TO 'UTC';
+
+GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO $USER;
+EOF

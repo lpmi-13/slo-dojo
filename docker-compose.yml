@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+    db:
+        container_name: postgres
+        image: postgres:14.1-alpine
+        restart: unless-stopped
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - DATABASE_NAME=api
+            - USER=apiuser
+            - USER_PASSWORD=apicontrol
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+            - ./sql-scripts/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh
+            - ./sql-scripts/create-table.sh:/docker-entrypoint-initdb.d/create-table.sh
+    app:
+        container_name: app
+        build: .
+        ports:
+            - "3000:3000"
+
+volumes:
+  postgres-data:

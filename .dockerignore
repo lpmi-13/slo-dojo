@@ -1,0 +1,4 @@
+postgres_data
+sql-scripts
+.git
+node_modules
