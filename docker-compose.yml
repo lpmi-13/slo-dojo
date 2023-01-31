@@ -23,5 +23,9 @@ services:
         ports:
             - "3000:3000"
 
+    simple-get-users:
+        container_name: simple-get-users
+        build: ./simple-get-users
+
 volumes:
   postgres-data:
