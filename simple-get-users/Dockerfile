@@ -12,4 +12,4 @@ COPY --from=builder /app/simple-get-users /simple-get-users
 
 # in the compose stack, we pass the DNS for the app container
 # directory to the process as an argument
-CMD ["/simple-get-users", "app"]
+CMD ["/simple-get-users", "app", "10"]

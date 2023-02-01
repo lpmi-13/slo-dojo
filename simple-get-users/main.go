@@ -4,29 +4,40 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
 	log.Println("making http request")
 
-	pauseLength := time.Second * 1
-
 	// if you're running this locally and outside the compose stack
 	// then just use `go run main.go localhost`
 	connectionURI := os.Args[1]
 
-	// this is okay for now...we'll add go routines and channels
-	// later to up the load a bit
-	for {
-		time.Sleep(pauseLength)
-		log.Println("calling /users endpoint...")
+	// we want to be able to parameterize the number of concurrent connections
+	concurrentConnections, _ := strconv.Atoi(os.Args[2])
 
-		// for this simple get users process, we don't need to
-		// do anything with the response
-		_, err := http.Get("http://" + connectionURI + ":3000/users")
-		if err != nil {
-			log.Fatal(err)
-		}
+	ch := make(chan string)
+
+	for i := 0; i < concurrentConnections; i++ {
+		go sendRequest(connectionURI, ch)
 	}
+
+	for {
+		go sendRequest(<-ch, ch)
+	}
+}
+
+func sendRequest(url string, ch chan string) {
+	time.Sleep(time.Millisecond * 300)
+
+	res, err := http.Get("http://" + url + ":3000/users")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("got status code:", res.StatusCode)
+
+	ch <- url
 }

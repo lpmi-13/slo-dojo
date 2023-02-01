@@ -20,12 +20,17 @@ services:
     app:
         container_name: app
         build: .
+        restart: unless-stopped
         ports:
             - "3000:3000"
 
     simple-get-users:
         container_name: simple-get-users
         build: ./simple-get-users
+        restart: unless-stopped
+        # don't start firing requests until the backend is up
+        depends_on:
+            - app
 
 volumes:
   postgres-data:
