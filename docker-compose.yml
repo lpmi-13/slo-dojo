@@ -13,24 +13,99 @@ services:
             - USER_PASSWORD=apicontrol
         ports:
             - "5432:5432"
+        networks:
+            - slo-dojo
         volumes:
             - postgres-data:/var/lib/postgresql/data
             - ./sql-scripts/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh
             - ./sql-scripts/create-table.sh:/docker-entrypoint-initdb.d/create-table.sh
+
     app:
         container_name: app
         build: .
+        depends_on:
+            - db
         restart: unless-stopped
         ports:
             - "3000:3000"
+        networks:
+            - slo-dojo
+        labels:
+            # - "traefik.enable=true"
+            - "traefik.http.routers.app.rule=Host(`app.localhost`)"
+            # - "traefik.port=3000"
 
+    # a process to generate background load via the http://app.localhost/users endpoint
     simple-get-users:
         container_name: simple-get-users
         build: ./simple-get-users
         restart: unless-stopped
+        network_mode: host
         # don't start firing requests until the backend is up
         depends_on:
             - app
+        labels:
+            - "traefik.http.routers.app.rule=Host(`load.localhost`)"
+
+    traefik:
+        image: "traefik:v2.9"
+        container_name: "traefik"
+        command:
+            # - "--log.level=DEBUG"
+            - "--api.insecure=true"
+            - "--providers.docker=true"
+            # - "--providers.docker.exposedbydefault=false"
+            # - "--entrypoints.web.address=:80"
+            - "--metrics.prometheus=true"
+            - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
+        ports:
+            - "80:80"
+            - "8080:8080"
+        networks:
+            - slo-dojo
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        restart: unless-stopped
+
+    prometheus:
+        container_name: prometheus
+        image: prom/prometheus:v2.1.0
+        volumes:
+            - ./prometheus/:/etc/prometheus/
+            # - prometheus_data:/prometheus
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+            - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+            - "--web.console.templates=/usr/share/prometheus/consoles"
+        ports:
+            - 9090:9090
+        networks:
+            - slo-dojo
+        restart: unless-stopped
+
+    grafana:
+        container_name: grafana
+        image: grafana/grafana-oss:8.5.14
+        user: "472"
+        depends_on:
+            - prometheus
+        networks:
+            - slo-dojo
+        # because our app backend is running on 3000
+        ports:
+            - 4000:3000
+        volumes:
+            - grafana-data:/var/lib/grafana
+            - ./grafana/provisioning:/etc/grafana/provisioning
+        environment:
+            - GF_INSTALL_PLUGINS=natel-discrete-panel,digiapulssi-breadcrumb-panel,yesoreyeram-boomtable-panel
+        restart: unless-stopped
 
 volumes:
-  postgres-data:
+    postgres-data:
+    grafana-data:
+
+networks:
+    slo-dojo:
+        driver: bridge
