@@ -6,9 +6,9 @@ What we need more of are hands-on activities to actually _do_ things with these 
 
 ## The challenges
 
-- The website is slow to load (latency is higher than our SLO)
-- The website is buggy (error rate for log-in is breaching our SLO)
-- The website takes a long time to return search results (the user journey for searching latency is higher than our SLO).
+-   The website is slow to load (latency is higher than our SLO)
+-   The website is buggy (error rate for log-in is breaching our SLO)
+-   The website takes a long time to return search results (the user journey for searching latency is higher than our SLO).
 
 ## Running it locally
 
@@ -19,3 +19,13 @@ docker-compose up --build
 ```
 
 and the API is now available at `localhost:3000` (eg, `localhost:3000/users` brings back all the current users in the database).
+
+### Loading the data
+
+We need a bunch of data in the database so that we can start to simulate realistic production workloads, so let's get some stuff in there!
+
+1. Set up the tables (`sql-scripts/create-tables.sh`)
+
+2. Put a bunch of sellers into the database via building the container in `/simple-insert-sellers`, and running `docker run -it --rm --network host simple-insert`.
+
+3. Load up a bunch of products for these sellers via the `/simple-insert-products` container. This is a little funky, because we need to loop through the sellers and create products for them.

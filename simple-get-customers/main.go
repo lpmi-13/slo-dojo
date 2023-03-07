@@ -32,7 +32,7 @@ func main() {
 func sendRequest(url string, ch chan string) {
 	time.Sleep(time.Millisecond * 300)
 
-	res, err := http.Get("http://" + url + "/users")
+	res, err := http.Get("http://" + url + "/customers")
 	if err != nil {
 		log.Fatal(err)
 	}

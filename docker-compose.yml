@@ -18,7 +18,7 @@ services:
         volumes:
             - postgres-data:/var/lib/postgresql/data
             - ./sql-scripts/create-database.sh:/docker-entrypoint-initdb.d/create-database.sh
-            - ./sql-scripts/create-table.sh:/docker-entrypoint-initdb.d/create-table.sh
+            - ./sql-scripts/create-tables.sh:/docker-entrypoint-initdb.d/create-tables.sh
 
     app:
         container_name: app
@@ -36,9 +36,9 @@ services:
             # - "traefik.port=3000"
 
     # a process to generate background load via the http://app.localhost/users endpoint
-    simple-get-users:
-        container_name: simple-get-users
-        build: ./simple-get-users
+    simple-get-customers:
+        container_name: simple-get-customers
+        build: ./simple-get-customers
         restart: unless-stopped
         network_mode: host
         # don't start firing requests until the backend is up
