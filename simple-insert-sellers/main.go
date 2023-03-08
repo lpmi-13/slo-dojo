@@ -6,11 +6,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/bxcodec/faker"
+	"github.com/go-faker/faker/v4"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+// seller_id is created automatically via table constraints
 type FakeSellerData struct {
 	SellerName     string `faker:"url"`
 	SellerLocation string `faker:"timezone"`
@@ -28,7 +29,6 @@ var (
 
 func main() {
 	totalLoops, _ := strconv.Atoi(os.Args[1])
-	// dsn := "host=localhost user=apiuser password=apicontrol dbname=api sslmode=disable"
 	dsn := "postgres://apiuser:apicontrol@localhost:5432/api"
 
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

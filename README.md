@@ -29,3 +29,9 @@ We need a bunch of data in the database so that we can start to simulate realist
 2. Put a bunch of sellers into the database via building the container in `/simple-insert-sellers`, and running `docker run -it --rm --network host simple-insert`.
 
 3. Load up a bunch of products for these sellers via the `/simple-insert-products` container. This is a little funky, because we need to loop through the sellers and create products for them.
+
+4. This is where it gets tricky...we want some purchases for the products we added, and the most straightforward way to connect customers to those purchases is to create the customers at the same time as the purchase (this is what the API will enable as well).
+
+So we loop over the sellers, and grab a random number of products (between 2 and 10, for example). For each batch of purchases, we generate a new customer and enter them into the database. Using that customer's name, we pull out their ID to use later when inserting the purchase.
+
+We only want each customer to purchase a product once (I guess in the real world they could do it multiple times, but this is simpler), so we have an empty slice to hold product IDs that the particular customer has already purchased. We generate random new product IDs until we have one that's not already been purchased by the customer and then we add that purchase, associated with the relevant customer, product, and seller.

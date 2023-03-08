@@ -7,7 +7,7 @@ CREATE TABLE customers (
   customer_id INT GENERATED ALWAYS AS IDENTITY,
   customer_name VARCHAR(30) NOT NULL,
   customer_email VARCHAR(30) NOT NULL,
-  customer_location VARCHAR(30) NOT NULL,
+  customer_location VARCHAR(60) NOT NULL,
   PRIMARY KEY(customer_id)
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE colors (
 CREATE TABLE products (
   product_id INT GENERATED ALWAYS AS IDENTITY,
   product_name VARCHAR(20),
-  weight DECIMAL(5,2),
-  sku VARCHAR(20),
+  weight INT,
+  sku VARCHAR(50),
   seller_id INT,
   color_id INT,
   PRIMARY KEY(product_id),
@@ -48,7 +48,7 @@ CREATE TABLE purchases (
    seller_id INT,
    product_id INT,
    date DATE,
-   price DECIMAL(5,2),
+   price INT,
    currency VARCHAR(3),
    PRIMARY KEY(purchase_id),
    CONSTRAINT fk_customer
@@ -118,8 +118,11 @@ ALTER TABLE reviews
 ALTER TABLE referrals
   OWNER TO $USER;
 
+/*
+we can just generate these later
 INSERT INTO customers (customer_name, customer_email, customer_location)
   VALUES ('Jerry', 'jerry@example.com', 'Scotland'), ('George', 'george@example.com', 'Georgia');
+*/
 
 /*
 we probably don't need these
