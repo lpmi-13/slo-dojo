@@ -74,6 +74,7 @@ func GetSellers() ([]Seller, error) {
 }
 
 // no idea why this isn't in the standard lib
+// we just wanna know if an int is in a slice
 func contains(s []int, id int) bool {
 	for _, v := range s {
 		if v == id {
@@ -101,8 +102,12 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	for _, s := range sellers {
-		for i := 0; i < totalLoops; i++ {
+	for i, s := range sellers {
+		if i%100 == 0 && i != 0 {
+			log.Printf("processed: %s sellers", i)
+		}
+
+		for j := 0; j < totalLoops; j++ {
 			InsertPurchases(s.SellerID)
 		}
 	}
@@ -172,7 +177,6 @@ func InsertPurchases(sellerId int) {
 		purchase.SellerID = sellerId
 		purchase.ProductID = product.ProductID
 
-		log.Println(purchase)
 		purchaseBatch = append(purchaseBatch, purchase)
 	}
 
