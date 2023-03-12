@@ -16,7 +16,7 @@ import (
 // product_id is created automatically via table contstraints
 type FakeProductData struct {
 	ProductName string `faker:"word"`
-	Weight      uint8  `faker:"oneof: 10, 26, 3, 74, 22, 112, 45"`
+	Weight      int    `faker:"oneof: 10, 26, 3, 74, 22, 112, 45"`
 	SKU         string `faker:"uuid_digit"`
 	// we'll update these later
 	SellerID int
@@ -43,6 +43,7 @@ var (
 )
 
 func main() {
+	log.Println("starting insertion of products")
 	// this will create "totalLoops" * "BatchSize" amount of products per seller
 	totalLoops, _ := strconv.Atoi(os.Args[1])
 	dsn := "postgres://apiuser:apicontrol@localhost:5432/api"
@@ -61,14 +62,17 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 
 	// loop through each seller and create a bunch of products for them
-	for _, s := range sellers {
+	for i, s := range sellers {
 		for i := 0; i < totalLoops; i++ {
 			InsertDataForSeller(s.SellerID)
 		}
-		log.Println("added batches for:", s.SellerName)
+
+		if i%50 == 0 && i != 0 {
+			log.Printf("finished with products for %d of %d sellers", i, len(sellers))
+		}
 	}
 
-	log.Println("all finished")
+	log.Println("all finished with products")
 }
 
 func GetSellers() ([]Seller, error) {

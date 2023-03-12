@@ -44,7 +44,7 @@ func main() {
 		}
 	}
 
-	log.Println("all finished")
+	log.Println("all finished with sellers")
 }
 
 func InsertData() {

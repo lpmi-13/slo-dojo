@@ -14,12 +14,12 @@ import (
 )
 
 // purchase_id is created automatically by table constraints
-type Purchase struct {
+type FakePurchase struct {
 	CustomerID int
 	SellerID   int
 	ProductID  int
 	Date       string `faker:"date"`
-	Price      uint16 `faker:"oneof: 4, 9, 18, 55, 102, 188, 225, 801, 3997"`
+	Price      int    `faker:"oneof: 4, 9, 18, 55, 102, 188, 225, 801, 3997"`
 	Currency   string `faker:"currency"`
 }
 
@@ -86,6 +86,7 @@ func contains(s []int, id int) bool {
 }
 
 func main() {
+	log.Println("starting insertion of purchases")
 	// this will create "totalLoops" * "BatchSize" amount of customers
 	totalLoops, _ := strconv.Atoi(os.Args[1])
 	dsn := "postgres://apiuser:apicontrol@localhost:5432/api"
@@ -104,7 +105,7 @@ func main() {
 
 	for i, s := range sellers {
 		if i%100 == 0 && i != 0 {
-			log.Printf("processed: %s sellers", i)
+			log.Printf("finished with purchases for %d of %d sellers", i, len(sellers))
 		}
 
 		for j := 0; j < totalLoops; j++ {
@@ -112,11 +113,11 @@ func main() {
 		}
 	}
 
-	log.Println("all finished")
+	log.Println("all finished with purchases")
 }
 
 func InsertPurchases(sellerId int) {
-	purchaseBatch := []Purchase{}
+	purchaseBatch := []FakePurchase{}
 
 	min := 2
 	max := 10
@@ -151,7 +152,7 @@ func InsertPurchases(sellerId int) {
 	productsCount := result.RowsAffected
 
 	for i := 0; i < numberOfPurchases; i++ {
-		purchase := Purchase{}
+		purchase := FakePurchase{}
 
 		err := faker.FakeData(&purchase)
 		if err != nil {
