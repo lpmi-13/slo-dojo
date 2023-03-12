@@ -74,8 +74,6 @@ func GetPurchases() ([]RetrievedPurchase, error) {
 }
 
 func InsertDataForPurchase(customerId int, productId int, purchaseId int) {
-	reviewBatch := []FakeReview{}
-
 	review := FakeReview{}
 
 	err := faker.FakeData(&review)
@@ -86,9 +84,8 @@ func InsertDataForPurchase(customerId int, productId int, purchaseId int) {
 	review.ProductID = productId
 	review.PurchaseID = purchaseId
 	review.ReviewerID = customerId
-	reviewBatch = append(reviewBatch, review)
 
-	err = db.Table("reviews").Create(reviewBatch).Error
+	err = db.Table("reviews").Create(review).Error
 	if err != nil {
 		log.Fatal(err)
 	}
