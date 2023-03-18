@@ -57,6 +57,8 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	log.Println("starting processing of referrals")
+
 	// loop through each customer and find one of their purchases
 	for i, c := range customers {
 		purchase := RetrievedPurchase{}
@@ -71,7 +73,7 @@ func main() {
 		}
 	}
 
-	log.Println("all finished with reviews")
+	log.Println("all finished with referrals")
 }
 
 // need to refactor this out into a utility file or something
@@ -158,7 +160,12 @@ func InsertDataForReferral(customerId int, sellerId int) {
 			log.Println(err)
 		}
 
-		referral.SellerID = sellerId
+		if sellerId == 0 {
+			referral.SellerID = 42
+		} else {
+			referral.SellerID = sellerId
+		}
+
 		referral.ReferrerID = customerId
 		referral.ReferreeID = nonReferredCustomer.CustomerID
 		referral.ReferralAccepted = randomBoolGenerator()
