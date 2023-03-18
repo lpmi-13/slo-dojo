@@ -39,10 +39,9 @@ type FakeReferral struct {
 }
 
 var (
-	ctx       = context.TODO()
-	BatchSize = 3
-	db        *gorm.DB
-	err       error
+	ctx = context.TODO()
+	db  *gorm.DB
+	err error
 )
 
 func main() {
@@ -96,9 +95,9 @@ func randomBoolGenerator() bool {
 func GetCustomers() ([]RetrievedCustomer, error) {
 	var customers []RetrievedCustomer
 
-	totalCustomersToRefer := 500
+	totalCustomersToRefer := 750
 
-	// just get 500, since we just need some fake data in there
+	// just get 750, since we just need some fake data in there
 	if result := db.Table("customers").Limit(totalCustomersToRefer).Find(&customers); result.Error != nil {
 		log.Println(result.Error)
 
@@ -131,8 +130,12 @@ func InsertDataForReferral(customerId int, sellerId int) {
 	// hold the customers we've already referred
 	var referredCustomers []int
 
-	// we'll send out 3 referrals per customer
-	for i := 0; i < BatchSize; i++ {
+	// we'll send out between 1-5 referrals per customer
+	max := 5
+	min := 1
+	batchSize := rand.Intn(max-min+1) + min
+
+	for i := 0; i < batchSize; i++ {
 		nonReferredCustomer := RetrievedCustomer{}
 
 		// keep looping until we find a nonCustomer that this customer hasn't referred yet
@@ -162,7 +165,7 @@ func InsertDataForReferral(customerId int, sellerId int) {
 		referralBatch = append(referralBatch, referral)
 	}
 
-	err = db.Table("referrals").CreateInBatches(referralBatch, BatchSize).Error
+	err = db.Table("referrals").CreateInBatches(referralBatch, batchSize).Error
 	if err != nil {
 		log.Fatal(err)
 	}
