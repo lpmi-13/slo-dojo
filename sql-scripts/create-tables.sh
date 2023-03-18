@@ -87,7 +87,7 @@ CREATE TABLE referrals (
   seller_id INT,
   referrer_id INT,
   referree_id INT,
-  referral_offer_data DATE,
+  referral_offer_date DATE,
   referral_accepted BOOLEAN NOT NULL,
   PRIMARY KEY(referral_id),
   CONSTRAINT fk_seller
