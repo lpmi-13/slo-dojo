@@ -109,22 +109,9 @@ func GetCustomers() ([]RetrievedCustomer, error) {
 	return customers, nil
 }
 
-func getNonCustomerPurchases(sellerId int) ([]RetrievedPurchase, error) {
-	var nonCustomerPurchases []RetrievedPurchase
-
-	if result := db.Table("purchases").Where("seller_id != ?", sellerId).Find(&nonCustomerPurchases); result.Error != nil {
-		log.Println(result.Error)
-
-		return nil, result.Error
-	}
-
-	return nonCustomerPurchases, nil
-}
-
 func InsertDataForReferral(customerId int, sellerId int) {
 	referralBatch := []FakeReferral{}
 
-	nonCustomerPurchases, err := getNonCustomerPurchases(sellerId)
 	if err != nil {
 		log.Println(err)
 	}
@@ -133,16 +120,20 @@ func InsertDataForReferral(customerId int, sellerId int) {
 	var referredCustomers []int
 
 	// we'll send out between 1-5 referrals per customer
-	max := 5
-	min := 1
-	batchSize := rand.Intn(max-min+1) + min
+	maxBatch := 5
+	minBatch := 1
+	batchSize := rand.Intn(maxBatch-minBatch+1) + minBatch
+
+	// random offsets to make sure we always get results
+	maxOffset := 8000
+	minOffset := 10
 
 	for i := 0; i < batchSize; i++ {
 		nonReferredCustomer := RetrievedCustomer{}
 
 		// keep looping until we find a nonCustomer that this customer hasn't referred yet
 		for {
-			randomInt := rand.Intn(len(nonCustomerPurchases))
+			randomInt := rand.Intn(maxOffset-minOffset+1) + minOffset
 			// find a product for this purchase
 			db.Table("purchases").Where("seller_id != ?", sellerId).Offset(randomInt).Limit(1).Find(&nonReferredCustomer)
 
@@ -158,12 +149,6 @@ func InsertDataForReferral(customerId int, sellerId int) {
 		err := faker.FakeData(&referral)
 		if err != nil {
 			log.Println(err)
-		}
-
-		if sellerId == 0 {
-			referral.SellerID = 42
-		} else {
-			referral.SellerID = sellerId
 		}
 
 		referral.ReferrerID = customerId
