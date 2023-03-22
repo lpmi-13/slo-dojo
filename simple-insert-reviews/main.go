@@ -53,7 +53,7 @@ func main() {
 	// loop through each purchase and create a review for it
 	for i, p := range purchases {
 		InsertDataForPurchase(p.CustomerID, p.ProductID, p.PurchaseID)
-		if i%100 == 0 && i != 0 {
+		if i%500 == 0 && i != 0 {
 			log.Printf("inserted reviews for %d of %d purchases", i, len(purchases))
 		}
 	}
