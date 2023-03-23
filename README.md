@@ -24,14 +24,30 @@ and the API is now available at `localhost:3000` (eg, `localhost:3000/users` bri
 
 We need a bunch of data in the database so that we can start to simulate realistic production workloads, so let's get some stuff in there!
 
-1. Set up the tables (`sql-scripts/create-tables.sh`)
+1. Set up the tables (`sql-scripts/create-tables.sh`), which gets run when the postgres container starts.
 
-2. Put a bunch of sellers into the database via building the container in `/simple-insert-sellers`, and running `docker run -it --rm --network host simple-insert`.
+2. Put a bunch of data in the database, and for now we can just run `./setup.sh`, which goes through the "simple-insert" directories and runs the inserts. At some point, these will probably all be unified, but they work now and are fast enough, so I'll leave them for later.
 
-3. Load up a bunch of products for these sellers via the `/simple-insert-products` container. This is a little funky, because we need to loop through the sellers and create products for them.
+### Ramping up the load
 
-4. This is where it gets tricky...we want some purchases for the products we added, and the most straightforward way to connect customers to those purchases is to create the customers at the same time as the purchase (this is what the API will enable as well).
+Now that we have data in our database we can start loading up the database with more realistic I/O requests.
 
-So we loop over the sellers, and grab a random number of products (between 2 and 10, for example). For each batch of purchases, we generate a new customer and enter them into the database. Using that customer's name, we pull out their ID to use later when inserting the purchase.
+-   Getting a random customer by ID
 
-We only want each customer to purchase a product once (I guess in the real world they could do it multiple times, but this is simpler), so we have an empty slice to hold product IDs that the particular customer has already purchased. We generate random new product IDs until we have one that's not already been purchased by the customer and then we add that purchase, associated with the relevant customer, product, and seller.
+`GET /customers/:id`
+
+-   Adding batch purchase (this is going to model some backfills of sellers wanting to add historical data)
+
+`POST /purchases`
+
+-   Adding a review (this might also have a batch endpoint)
+
+`POST /review`
+
+-   Adding a referral offer (meaning not yet accepted)
+
+`POST /referral`
+
+-   Updating a referral when the offer is accepted (sets accepted to true, basically)
+
+`PUT /referral`

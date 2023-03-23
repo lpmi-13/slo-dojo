@@ -13,14 +13,11 @@ app.use(
 );
 
 app.get("/", (request, response) => {
-    response.json({ info: "Node.js, Express, and Postgres API" });
+    response.json({ info: "This is the Slo Dojo!" });
 });
 
 app.get("/customers", db.getCustomers);
 app.get("/customers/:id", db.getCustomerById);
-app.post("/customers", db.createCustomer);
-app.put("/customers/:id", db.updateCustomer);
-app.delete("/customers/:id", db.deleteCustomer);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}`);
