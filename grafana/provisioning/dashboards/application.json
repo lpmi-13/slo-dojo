@@ -25,7 +25,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1677106684192,
+  "iteration": 1679525884674,
   "links": [
     {
       "asDropdown": true,
@@ -123,10 +123,34 @@
             "uid": "P67756107AFE358C4"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
-          "legendFormat": "{{le}}",
+          "expr": "histogram_quantile(0.75, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "p75 load balancer latency",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P67756107AFE358C4"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
+          "hide": false,
+          "legendFormat": "p95 load balancer latency",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P67756107AFE358C4"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
+          "hide": false,
+          "legendFormat": "p99 load balancer latency",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Request duration seconds",
@@ -213,8 +237,10 @@
             "uid": "P67756107AFE358C4"
           },
           "editorMode": "code",
+          "exemplar": false,
           "expr": "rate(traefik_entrypoint_requests_total{job=\"load-balancer\",method=\"GET\",protocol=\"http\"}[1m])",
           "format": "time_series",
+          "instant": false,
           "legendFormat": "{{code}}",
           "range": true,
           "refId": "A"
@@ -373,6 +399,6 @@
   "timezone": "",
   "title": "Load balancer metrics",
   "uid": "xHsKGXKnk_repl",
-  "version": 4,
+  "version": 1,
   "weekStart": ""
 }
