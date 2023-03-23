@@ -34,6 +34,14 @@ services:
             # - "traefik.enable=true"
             - "traefik.http.routers.app.rule=Host(`app.localhost`)"
             # - "traefik.port=3000"
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.50"
+                    memory: 100M
+                reservations:
+                    cpus: "0.25"
+                    memory: 50M
 
     # a process to generate background load via the http://app.localhost/users endpoint
     simple-get-customers:
@@ -66,6 +74,14 @@ services:
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
         restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.75"
+                    memory: 200M
+                reservations:
+                    cpus: "0.50"
+                    memory: 100M
 
     prometheus:
         container_name: prometheus
@@ -101,6 +117,14 @@ services:
         environment:
             - GF_INSTALL_PLUGINS=natel-discrete-panel,digiapulssi-breadcrumb-panel,yesoreyeram-boomtable-panel
         restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    cpus: "0.50"
+                    memory: 50M
+                reservations:
+                    cpus: "0.25"
+                    memory: 20M
 
 volumes:
     postgres-data:
