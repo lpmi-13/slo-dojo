@@ -4,7 +4,7 @@ SLO Dojo is a hands-on workshop for practicing SLI/SLO investigation on a small 
 
 The stack starts in a known bad state every time. Learners inspect the live service, metrics, dashboard, and code, then make changes until the SLO breach alerts clear.
 
-![SLOs breached in the simulation](images/slos_breaches.png)
+![SLOs breached in the simulation](images/slo_breaches.png)
 
 ## Workshop Goal
 
