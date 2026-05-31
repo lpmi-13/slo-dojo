@@ -1,68 +1,110 @@
 groups:
     - name: slo-dojo
       rules:
-          - alert: HomepageLatencySLOBreach
+          - record: slo_dojo:homepage_p95_seconds:rate1m
             expr: |
                 histogram_quantile(
                   0.95,
                   sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/",status_code=~"2.."}[1m])) by (le)
-                ) > 0.15
+                )
+
+          - record: slo_dojo:homepage_requests_per_second:rate1m
+            expr: |
+                sum(rate(slo_dojo_http_request_duration_seconds_count{route="/",status_code=~"2.."}[1m]))
+
+          - record: slo_dojo:homepage_p95_seconds:max5m
+            expr: |
+                max_over_time(slo_dojo:homepage_p95_seconds:rate1m[5m])
+
+          - record: slo_dojo:homepage_requests_per_second:max5m
+            expr: |
+                max_over_time(slo_dojo:homepage_requests_per_second:rate1m[5m])
+
+          - record: slo_dojo:login_failure_ratio:rate1m
+            expr: |
+                (
+                  sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
+                  or vector(0)
+                )
+                /
+                sum(rate(slo_dojo_login_attempts_total[1m]))
+
+          - record: slo_dojo:login_attempts_per_second:rate1m
+            expr: |
+                sum(rate(slo_dojo_login_attempts_total[1m]))
+
+          - record: slo_dojo:login_failure_ratio:max5m
+            expr: |
+                max_over_time(slo_dojo:login_failure_ratio:rate1m[5m])
+
+          - record: slo_dojo:login_attempts_per_second:max5m
+            expr: |
+                max_over_time(slo_dojo:login_attempts_per_second:rate1m[5m])
+
+          - record: slo_dojo:search_p95_seconds:rate1m
+            expr: |
+                histogram_quantile(
+                  0.95,
+                  sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
+                )
+
+          - record: slo_dojo:search_requests_per_second:rate1m
+            expr: |
+                sum(rate(slo_dojo_http_request_duration_seconds_count{route="/search",status_code=~"2.."}[1m]))
+
+          - record: slo_dojo:search_p95_seconds:max5m
+            expr: |
+                max_over_time(slo_dojo:search_p95_seconds:rate1m[5m])
+
+          - record: slo_dojo:search_requests_per_second:max5m
+            expr: |
+                max_over_time(slo_dojo:search_requests_per_second:rate1m[5m])
+
+          - alert: HomepageLatencySLOBreach
+            expr: |
+                (slo_dojo:homepage_p95_seconds:max5m > 0.15)
+                or on() (slo_dojo:homepage_requests_per_second:max5m <= 0)
+                or on() absent(slo_dojo:homepage_requests_per_second:max5m)
             labels:
                 severity: workshop
                 slo: homepage_latency
             annotations:
                 summary: "Homepage latency SLO is breached"
-                feedback: "Homepage latency SLO resolved when this alert clears."
+                feedback: "Homepage latency SLO is back within target."
 
           - alert: LoginFailureSLOBreach
             expr: |
-                (
-                  sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
-                  /
-                  sum(rate(slo_dojo_login_attempts_total[1m]))
-                ) > 0.005
+                (slo_dojo:login_failure_ratio:max5m > 0.005)
+                or on() (slo_dojo:login_attempts_per_second:max5m <= 0)
+                or on() absent(slo_dojo:login_attempts_per_second:max5m)
             labels:
                 severity: workshop
                 slo: login_success
             annotations:
                 summary: "Login success SLO is breached"
-                feedback: "Login success SLO resolved when this alert clears."
+                feedback: "Login success SLO is back within target."
 
           - alert: SearchLatencySLOBreach
             expr: |
-                histogram_quantile(
-                  0.95,
-                  sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
-                ) > 0.05
+                (slo_dojo:search_p95_seconds:max5m > 0.05)
+                or on() (slo_dojo:search_requests_per_second:max5m <= 0)
+                or on() absent(slo_dojo:search_requests_per_second:max5m)
             labels:
                 severity: workshop
                 slo: search_latency
             annotations:
                 summary: "Search latency SLO is breached"
-                feedback: "Search latency SLO resolved when this alert clears."
+                feedback: "Search latency SLO is back within target."
 
           - alert: SLODojoComplete
             expr: |
                 vector(1)
-                and on() (
-                  histogram_quantile(
-                    0.95,
-                    sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/",status_code=~"2.."}[1m])) by (le)
-                  ) <= 0.15
-                )
-                and on() (
-                  (
-                    sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
-                    /
-                    sum(rate(slo_dojo_login_attempts_total[1m]))
-                  ) <= 0.005
-                )
-                and on() (
-                  histogram_quantile(
-                    0.95,
-                    sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
-                  ) <= 0.05
-                )
+                and on() (slo_dojo:homepage_requests_per_second:max5m > 0)
+                and on() (slo_dojo:homepage_p95_seconds:max5m <= 0.15)
+                and on() (slo_dojo:login_attempts_per_second:max5m > 0)
+                and on() (slo_dojo:login_failure_ratio:max5m <= 0.005)
+                and on() (slo_dojo:search_requests_per_second:max5m > 0)
+                and on() (slo_dojo:search_p95_seconds:max5m <= 0.05)
             labels:
                 severity: success
                 slo: all

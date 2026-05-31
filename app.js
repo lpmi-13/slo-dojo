@@ -15,6 +15,7 @@ function createApp() {
     app.get("/alerts", alerts.alertPage);
     app.get("/alerts/events", alerts.alertEvents);
     app.get("/alerts/history", alerts.alertHistory);
+    app.get("/grafana/health", alerts.grafanaHealth);
     app.post("/alertmanager", alerts.alertmanagerWebhook);
     app.get("/health", (request, response) => {
         response.status(200).json({ ok: true });

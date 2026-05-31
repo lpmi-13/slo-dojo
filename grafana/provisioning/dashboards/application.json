@@ -86,7 +86,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/\",status_code=~\"2..\"}[1m])) by (le))",
+          "expr": "slo_dojo:homepage_p95_seconds:max5m",
           "legendFormat": "homepage p95",
           "range": true,
           "refId": "A"
@@ -153,7 +153,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(slo_dojo_login_attempts_total{result=\"failure\"}[1m])) / sum(rate(slo_dojo_login_attempts_total[1m]))",
+          "expr": "slo_dojo:login_failure_ratio:max5m",
           "legendFormat": "login failure ratio",
           "range": true,
           "refId": "A"
@@ -220,7 +220,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/search\",status_code=~\"2..\"}[1m])) by (le))",
+          "expr": "slo_dojo:search_p95_seconds:max5m",
           "legendFormat": "search p95",
           "range": true,
           "refId": "A"
@@ -312,7 +312,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/\",status_code=~\"2..\"}[1m])) by (le))",
+          "expr": "slo_dojo:homepage_p95_seconds:max5m",
           "legendFormat": "homepage p95",
           "range": true,
           "refId": "A"
@@ -404,7 +404,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/search\",status_code=~\"2..\"}[1m])) by (le))",
+          "expr": "slo_dojo:search_p95_seconds:max5m",
           "legendFormat": "search p95",
           "range": true,
           "refId": "A"
@@ -496,7 +496,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(slo_dojo_login_attempts_total{result=\"failure\"}[1m])) / sum(rate(slo_dojo_login_attempts_total[1m]))",
+          "expr": "slo_dojo:login_failure_ratio:max5m",
           "legendFormat": "login failure ratio",
           "range": true,
           "refId": "A"

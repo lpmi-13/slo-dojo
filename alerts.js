@@ -1,6 +1,7 @@
 const clients = new Set();
 const history = [];
 const maxHistory = 100;
+const defaultGrafanaHealthUrl = "http://grafana:3000/api/health";
 
 function alertPage(request, response) {
     response.type("html").send(`<!doctype html>
@@ -43,6 +44,28 @@ function alertPage(request, response) {
       max-width: 720px;
       line-height: 1.6;
       color: #c9d6dc;
+    }
+
+    .muted {
+      color: #9db0b8;
+      font-weight: 700;
+    }
+
+    a {
+      color: #f6ce73;
+      font-weight: 700;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      color: #ffe09a;
+    }
+
+    a:focus-visible {
+      outline: 2px solid #f0b84f;
+      outline-offset: 3px;
+      border-radius: 3px;
     }
 
     button {
@@ -109,7 +132,10 @@ function alertPage(request, response) {
   <main>
     <h1>SLO Dojo On-Call</h1>
     <p>
-      Go ahead and click allow notifications, then open the Grafana tab.
+      Go ahead and click allow notifications, then
+      <span id="grafana-waiting" class="muted">wait for Grafana to start</span><a id="grafana-link" href="http://localhost:4000" target="_blank" rel="noopener noreferrer" aria-label="Open the Grafana dashboard in a new tab" hidden>open the Grafana tab</a>.
+    </p>
+    <p>
       It is your first day on call for this service, but don't worry,
       surely nothing can go wrong...
     </p>
@@ -120,10 +146,38 @@ function alertPage(request, response) {
 
   <script>
     const allowButton = document.querySelector("#allow");
+    const grafanaLink = document.querySelector("#grafana-link");
+    const grafanaWaiting = document.querySelector("#grafana-waiting");
     const statusNode = document.querySelector("#status");
     const feedNode = document.querySelector("#feed");
     const firingAlerts = new Set();
     const seen = new Set();
+
+    const grafanaUrl = new URL(window.location.href);
+    grafanaUrl.port = "4000";
+    grafanaUrl.pathname = "/";
+    grafanaUrl.search = "";
+    grafanaUrl.hash = "";
+    grafanaLink.href = grafanaUrl.toString();
+
+    async function checkGrafanaReady() {
+      try {
+        const response = await fetch("/grafana/health", {
+          cache: "no-store",
+        });
+
+        if (response.ok) {
+          grafanaWaiting.hidden = true;
+          grafanaLink.hidden = false;
+          return;
+        }
+      } catch (error) {
+      }
+
+      grafanaWaiting.hidden = false;
+      grafanaLink.hidden = true;
+      window.setTimeout(checkGrafanaReady, 2000);
+    }
 
     function setStatus(message) {
       statusNode.textContent = message;
@@ -217,6 +271,7 @@ function alertPage(request, response) {
       document.title = firingAlerts.size > 0 ? "PAGE - SLO Dojo" : "SLO Dojo On-Call";
     };
 
+    checkGrafanaReady();
     notificationPermission();
   </script>
 </body>
@@ -245,12 +300,13 @@ function alertEvents(request, response) {
 function summarize(alert) {
     const alertname = alert.labels.alertname || "SLODojoAlert";
     const summary = alert.annotations.summary || alertname;
+    const feedback = alert.annotations.feedback || `${alertname} resolved`;
     const status = alert.status || "firing";
     const titlePrefix = status === "resolved" ? "Resolved" : "Page";
 
     return {
         alertname,
-        body: summary,
+        body: status === "resolved" ? feedback : summary,
         id: `${alert.fingerprint || alertname}-${status}-${Date.now()}`,
         receivedAt: new Date().toISOString(),
         status,
@@ -282,9 +338,44 @@ function alertmanagerWebhook(request, response) {
     response.status(202).json({ received: alerts.length });
 }
 
+async function grafanaHealth(request, response) {
+    const hostGrafanaUrl = new URL(request.protocol + "://" + request.get("host"));
+    hostGrafanaUrl.port = "4000";
+    hostGrafanaUrl.pathname = "/api/health";
+    hostGrafanaUrl.search = "";
+    hostGrafanaUrl.hash = "";
+
+    const healthUrls = [
+        process.env.GRAFANA_HEALTH_URL || defaultGrafanaHealthUrl,
+        hostGrafanaUrl.toString(),
+    ];
+
+    for (const healthUrl of new Set(healthUrls)) {
+        try {
+            const grafanaResponse = await fetch(healthUrl, {
+                signal: AbortSignal.timeout(1000),
+            });
+
+            if (!grafanaResponse.ok) {
+                continue;
+            }
+
+            const body = await grafanaResponse.json();
+
+            if (body.database === "ok") {
+                return response.status(200).json({ ready: true });
+            }
+        } catch (error) {
+        }
+    }
+
+    return response.status(503).json({ ready: false });
+}
+
 module.exports = {
     alertEvents,
     alertHistory,
     alertPage,
     alertmanagerWebhook,
+    grafanaHealth,
 };

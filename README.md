@@ -38,7 +38,7 @@ Start from a clean seeded database:
 When the app is up, open `http://localhost:3000/alerts` and click **Allow notifications**.
 Then open Grafana in another tab at `http://localhost:4000`. It is your first day on call for this service, but don't worry, surely nothing can go wrong...
 
-After the workload has been running for about a minute, Prometheus sends the SLO breach alerts to Alertmanager, and Alertmanager sends them to the browser tab. Keep the tab open while you work so it can also notify you when alerts resolve.
+After the workload has been running for a few minutes, Prometheus sends the SLO breach alerts to Alertmanager, and Alertmanager sends them to the browser tab. Keep the tab open while you work so it can also notify you when alerts resolve.
 
 Or run the stack without deleting existing volumes:
 
@@ -75,7 +75,7 @@ The seeded password is `slo-dojo-password`.
 
 ## Checking SLO State
 
-After the stack has been running for at least a minute:
+After the stack has been running for at least five minutes:
 
 ```bash
 npm run dojo:check
@@ -93,7 +93,7 @@ After changing app code, redeploy the app container from the current local sourc
 ./scripts/redeploy-app.sh
 ```
 
-This rebuilds and restarts only the app service. The database, Prometheus, Alertmanager, Grafana, and workload keep running, so the alert state should update after the next metric window.
+This rebuilds and restarts only the app service. The database, Prometheus, Alertmanager, Grafana, and workload keep running, so the alert state should update after the next five-minute metric window.
 
 Database changes that affect seeded schema files only apply to a fresh database volume. For live fixes such as adding an index, apply the change to the running database rather than resetting the whole stack.
 

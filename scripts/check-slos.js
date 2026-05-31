@@ -3,25 +3,18 @@ const prometheusUrl = process.env.PROMETHEUS_URL || "http://localhost:9090";
 const checks = [
     {
         name: "Homepage latency SLO",
-        query: `histogram_quantile(
-            0.95,
-            sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/",status_code=~"2.."}[1m])) by (le)
-        ) <= 0.15`,
+        query: `slo_dojo:homepage_requests_per_second:max5m > 0
+            and on() slo_dojo:homepage_p95_seconds:max5m <= 0.15`,
     },
     {
         name: "Login success SLO",
-        query: `(
-            sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
-            /
-            sum(rate(slo_dojo_login_attempts_total[1m]))
-        ) <= 0.005`,
+        query: `slo_dojo:login_attempts_per_second:max5m > 0
+            and on() slo_dojo:login_failure_ratio:max5m <= 0.005`,
     },
     {
         name: "Search latency SLO",
-        query: `histogram_quantile(
-            0.95,
-            sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
-        ) <= 0.05`,
+        query: `slo_dojo:search_requests_per_second:max5m > 0
+            and on() slo_dojo:search_p95_seconds:max5m <= 0.05`,
     },
 ];
 
