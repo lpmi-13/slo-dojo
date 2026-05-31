@@ -1,53 +1,88 @@
 # SLO Dojo
 
-The idea of SLIs and SLOs is fairly straightforward, and there's no shortage of blog posts and videos and articles explaining them.
+SLO Dojo is a hands-on workshop for practicing SLI/SLO investigation on a small production-like web service.
 
-What we need more of are hands-on activities to actually _do_ things with these concepts. So I made this repo to be a hands-on self-guided workshop looking at the metrics of a particular web application, and identifying and fixing 3 specific areas that are impacting the given SLOs (these will be visible in a grafana dashboard, and very clearly NOT meeting our set Service Level Objective targets).
+The stack starts in a known bad state every time. Learners inspect the live service, metrics, dashboard, and code, then make changes until the SLO breach alerts clear.
 
-## The challenges
+## Workshop Goal
 
--   The website is slow to load (latency is higher than our SLO)
--   The website is buggy (error rate for log-in is breaching our SLO)
--   The website takes a long time to return search results (the user journey for searching latency is higher than our SLO).
+Resolve these three fixed SLO breaches:
 
-## Running it locally
+- Homepage p95 latency is above `0.15s`.
+- Login failure ratio is above `0.5%`.
+- Search p95 latency is above `0.05s`.
 
-So far, the only thing that happens is gets the server and database up and running locally. We can also start a (very) simple background load, all by running:
+The workshop intentionally uses the same three underlying problems on every reset. There is no separate randomized final scenario.
 
+## Feedback Model
+
+The system gives feedback only through SLO alert state:
+
+- `HomepageLatencySLOBreach` clears when the homepage latency SLO is resolved.
+- `LoginFailureSLOBreach` clears when the login success SLO is resolved.
+- `SearchLatencySLOBreach` clears when the search latency SLO is resolved.
+- `SLODojoComplete` fires when all three SLOs are resolved at the same time.
+
+The dashboard and checker do not provide root-cause hints.
+
+## Running Locally
+
+Start from a clean seeded database:
+
+```bash
+./setup.sh
 ```
-docker-compose up --build
+
+Or run the stack without deleting existing volumes:
+
+```bash
+docker compose up --build
 ```
 
-and the API is now available at `localhost:3000` (eg, `localhost:3000/users` brings back all the current users in the database).
+Services:
 
-### Loading the data
+- App: `http://localhost:3000`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:4000`
+- Traefik dashboard: `http://localhost:8080`
 
-We need a bunch of data in the database so that we can start to simulate realistic production workloads, so let's get some stuff in there!
+The app image also runs a workload generator that continuously exercises the homepage, login, and search journeys.
 
-1. Set up the tables (`sql-scripts/create-tables.sh`), which gets run when the postgres container starts.
+## Useful Endpoints
 
-2. Put a bunch of data in the database, and for now we can just run `./setup.sh`, which goes through the "simple-insert" directories and runs the inserts. At some point, these will probably all be unified, but they work now and are fast enough, so I'll leave them for later.
+- `GET /`
+- `GET /customers`
+- `GET /customers/:id`
+- `POST /login`
+- `GET /search?q=atlas`
+- `POST /purchases`
+- `POST /reviews`
+- `POST /referrals`
+- `PUT /referrals/:id/accept`
+- `GET /metrics`
 
-### Ramping up the load
+Seeded learner login users use emails from `learner01@example.com` through `learner40@example.com`.
+The seeded password is `slo-dojo-password`.
 
-Now that we have data in our database we can start loading up the database with more realistic I/O requests.
+## Checking SLO State
 
--   Getting a random customer by ID
+After the stack has been running for at least a minute:
 
-`GET /customers/:id`
+```bash
+npm run dojo:check
+```
 
--   Adding batch purchase (this is going to model some backfills of sellers wanting to add historical data)
+This reports only whether each SLO is still breached or resolved, plus whether all workshop SLOs are resolved together.
 
-`POST /purchases`
+## Data
 
--   Adding a review (this might also have a batch endpoint)
+Database initialization creates deterministic workshop data:
 
-`POST /review`
+- 500 sellers
+- 12,040 customers
+- 250,000 products
+- 100,000 purchases
+- 100,000 reviews
+- 25,000 referrals
 
--   Adding a referral offer (meaning not yet accepted)
-
-`POST /referral`
-
--   Updating a referral when the offer is accepted (sets accepted to true, basically)
-
-`PUT /referral`
+The schema and data are created by scripts in `sql-scripts/` when the Postgres volume is first initialized.

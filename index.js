@@ -1,24 +1,8 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const app = express();
-const port = 3000;
+const { createApp } = require("./app");
 
-const db = require("./queries");
-
-app.use(bodyParser.json());
-app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
-);
-
-app.get("/", (request, response) => {
-    response.json({ info: "This is the Slo Dojo!" });
-});
-
-app.get("/customers", db.getCustomers);
-app.get("/customers/:id", db.getCustomerById);
+const port = Number(process.env.PORT || 3000);
+const app = createApp();
 
 app.listen(port, () => {
-    console.log(`App running on port ${port}`);
+    console.log(`SLO Dojo app running on port ${port}`);
 });

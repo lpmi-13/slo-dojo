@@ -19,6 +19,7 @@ The users and the Sellers are probably the two main entities. Users buy things, 
 -   Name
 -   Email
 -   Location
+-   Password hash
 
 ### Seller
 
@@ -87,6 +88,10 @@ This section maps out what actually triggers updates to the database. This is go
 -   A review is deleted. This happens every so often. Spammers put fake reviews up, either to skew a brand's rating or to advertise their own products, and so we need to remove these. This also has a cascading effect on the overall review rating for a seller.
 
 -   A person reads a review. This is very common, and is just a straight GET request to the Review endpoint.
+
+-   A person logs in. This checks a customer email and password hash and records the login outcome as a service-level signal.
+
+-   A person searches for products. This is a read-heavy journey over product names.
 
 -   A company wants to load a bunch of products. They just signed up with the platform and they want to make sure all their products are available to be annotated with reviews and referrals. This data is usually batch inserted, so it would be a call to an endpoint to batch load products for a specific seller. It could also be that the company already has reviews and referrals on those products, so sometimes those also get batch inserted when adding products.
 

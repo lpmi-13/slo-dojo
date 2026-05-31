@@ -1,0 +1,71 @@
+groups:
+    - name: slo-dojo
+      rules:
+          - alert: HomepageLatencySLOBreach
+            expr: |
+                histogram_quantile(
+                  0.95,
+                  sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/",status_code=~"2.."}[1m])) by (le)
+                ) > 0.15
+            labels:
+                severity: workshop
+                slo: homepage_latency
+            annotations:
+                summary: "Homepage latency SLO is breached"
+                feedback: "Homepage latency SLO resolved when this alert clears."
+
+          - alert: LoginFailureSLOBreach
+            expr: |
+                (
+                  sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
+                  /
+                  sum(rate(slo_dojo_login_attempts_total[1m]))
+                ) > 0.005
+            labels:
+                severity: workshop
+                slo: login_success
+            annotations:
+                summary: "Login success SLO is breached"
+                feedback: "Login success SLO resolved when this alert clears."
+
+          - alert: SearchLatencySLOBreach
+            expr: |
+                histogram_quantile(
+                  0.95,
+                  sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
+                ) > 0.05
+            labels:
+                severity: workshop
+                slo: search_latency
+            annotations:
+                summary: "Search latency SLO is breached"
+                feedback: "Search latency SLO resolved when this alert clears."
+
+          - alert: SLODojoComplete
+            expr: |
+                vector(1)
+                and on() (
+                  histogram_quantile(
+                    0.95,
+                    sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/",status_code=~"2.."}[1m])) by (le)
+                  ) <= 0.15
+                )
+                and on() (
+                  (
+                    sum(rate(slo_dojo_login_attempts_total{result="failure"}[1m]))
+                    /
+                    sum(rate(slo_dojo_login_attempts_total[1m]))
+                  ) <= 0.005
+                )
+                and on() (
+                  histogram_quantile(
+                    0.95,
+                    sum(rate(slo_dojo_http_request_duration_seconds_bucket{route="/search",status_code=~"2.."}[1m])) by (le)
+                  ) <= 0.05
+                )
+            labels:
+                severity: success
+                slo: all
+            annotations:
+                summary: "All SLO breach alerts are resolved"
+                feedback: "All workshop SLOs are resolved."

@@ -24,28 +24,215 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
-  "iteration": 1679525884674,
-  "links": [
-    {
-      "asDropdown": true,
-      "icon": "external link",
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "targetBlank": false,
-      "title": "MySQL Database Dashboards",
-      "tooltip": "",
-      "type": "dashboards",
-      "url": ""
-    }
-  ],
+  "id": null,
+  "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P67756107AFE358C4"
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.15
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/\",status_code=~\"2..\"}[1m])) by (le))",
+          "legendFormat": "homepage p95",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Homepage p95 latency target: 0.15s",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.005
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(slo_dojo_login_attempts_total{result=\"failure\"}[1m])) / sum(rate(slo_dojo_login_attempts_total[1m]))",
+          "legendFormat": "login failure ratio",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Login failure target: 0.5%",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/search\",status_code=~\"2..\"}[1m])) by (le))",
+          "legendFormat": "search p95",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Search p95 latency target: 0.05s",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -57,7 +244,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -65,19 +252,19 @@
               "viz": false
             },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "line"
             }
           },
           "mappings": [],
@@ -90,7 +277,7 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 0.15
               }
             ]
           },
@@ -102,12 +289,14 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 0
+        "y": 6
       },
-      "id": 147,
+      "id": 4,
       "options": {
         "legend": {
-          "calcs": [],
+          "calcs": [
+            "lastNotNull"
+          ],
           "displayMode": "list",
           "placement": "bottom"
         },
@@ -120,48 +309,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P67756107AFE358C4"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.75, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
-          "legendFormat": "p75 load balancer latency",
+          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/\",status_code=~\"2..\"}[1m])) by (le))",
+          "legendFormat": "homepage p95",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P67756107AFE358C4"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
-          "hide": false,
-          "legendFormat": "p95 load balancer latency",
-          "range": true,
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P67756107AFE358C4"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(traefik_entrypoint_request_duration_seconds_bucket[1m])) by (le))",
-          "hide": false,
-          "legendFormat": "p99 load balancer latency",
-          "range": true,
-          "refId": "C"
         }
       ],
-      "title": "Request duration seconds",
+      "title": "Homepage latency",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "P67756107AFE358C4"
+        "uid": "prometheus"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -172,7 +336,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -180,19 +344,19 @@
               "viz": false
             },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "line"
             }
           },
           "mappings": [],
@@ -205,7 +369,159 @@
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 0.05
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum(rate(slo_dojo_http_request_duration_seconds_bucket{route=\"/search\",status_code=~\"2..\"}[1m])) by (le))",
+          "legendFormat": "search p95",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Search latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.005
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(slo_dojo_login_attempts_total{result=\"failure\"}[1m])) / sum(rate(slo_dojo_login_attempts_total[1m]))",
+          "legendFormat": "login failure ratio",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Login failures",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -216,9 +532,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 14
       },
-      "id": 145,
+      "id": 7,
       "options": {
         "legend": {
           "calcs": [],
@@ -234,171 +550,36 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P67756107AFE358C4"
+            "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "rate(traefik_entrypoint_requests_total{job=\"load-balancer\",method=\"GET\",protocol=\"http\"}[1m])",
-          "format": "time_series",
-          "instant": false,
-          "legendFormat": "{{code}}",
+          "expr": "ALERTS{alertname=~\"HomepageLatencySLOBreach|LoginFailureSLOBreach|SearchLatencySLOBreach|SLODojoComplete\"}",
+          "legendFormat": "{{alertname}} {{alertstate}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Total Requests per Minute",
+      "title": "SLO alert states",
       "type": "timeseries"
     }
   ],
   "refresh": "5s",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "slo-dojo"
+  ],
   "templating": {
-    "list": [
-      {
-        "current": {
-          "selected": false,
-          "text": "mongo1",
-          "value": "mongo1"
-        },
-        "description": "the mongo members",
-        "hide": 2,
-        "includeAll": true,
-        "label": "member_idx",
-        "multi": false,
-        "name": "host",
-        "options": [
-          {
-            "selected": false,
-            "text": "All",
-            "value": "$__all"
-          },
-          {
-            "selected": true,
-            "text": "mongo1",
-            "value": "mongo1"
-          },
-          {
-            "selected": false,
-            "text": "mongo2",
-            "value": "mongo2"
-          },
-          {
-            "selected": false,
-            "text": "mongo3",
-            "value": "mongo3"
-          }
-        ],
-        "query": "mongo1,mongo2,mongo3",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "mongo_repl",
-          "value": "mongo_repl"
-        },
-        "description": "the name of the replica set",
-        "hide": 2,
-        "includeAll": false,
-        "label": "Replica Set",
-        "multi": false,
-        "name": "replSet",
-        "options": [
-          {
-            "selected": true,
-            "text": "mongo_repl",
-            "value": "mongo_repl"
-          }
-        ],
-        "query": "mongo_repl",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "27017",
-          "value": "27017"
-        },
-        "description": "mongo metric port",
-        "hide": 2,
-        "includeAll": false,
-        "label": "mongo metric port",
-        "multi": false,
-        "name": "port",
-        "options": [
-          {
-            "selected": true,
-            "text": "27017",
-            "value": "27017"
-          }
-        ],
-        "query": "27017",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "auto": true,
-        "auto_count": 30,
-        "auto_min": "1s",
-        "current": {
-          "selected": false,
-          "text": "1m",
-          "value": "1m"
-        },
-        "hide": 2,
-        "label": "interval",
-        "name": "interval",
-        "options": [
-          {
-            "selected": false,
-            "text": "auto",
-            "value": "$__auto_interval_interval"
-          },
-          {
-            "selected": true,
-            "text": "1m",
-            "value": "1m"
-          },
-          {
-            "selected": false,
-            "text": "5m",
-            "value": "5m"
-          },
-          {
-            "selected": false,
-            "text": "1h",
-            "value": "1h"
-          },
-          {
-            "selected": false,
-            "text": "6h",
-            "value": "6h"
-          },
-          {
-            "selected": false,
-            "text": "1d",
-            "value": "1d"
-          }
-        ],
-        "query": "1m,5m,1h,6h,1d",
-        "refresh": 2,
-        "skipUrlSync": false,
-        "type": "interval"
-      }
-    ]
+    "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Load balancer metrics",
-  "uid": "xHsKGXKnk_repl",
+  "title": "SLO Dojo",
+  "uid": "slo-dojo",
   "version": 1,
   "weekStart": ""
 }
