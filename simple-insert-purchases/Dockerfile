@@ -10,6 +10,8 @@ FROM scratch
 
 COPY --from=builder /app/simple-insert-purchases /simple-insert-purchases
 
+USER 65532:65532
+
 # in the compose stack, we pass the DNS for the app container as defined by traefik
 # directory to the process as an argument
 CMD ["/simple-insert-purchases", "5"]

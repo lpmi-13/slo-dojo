@@ -10,4 +10,6 @@ COPY *.js /app/
 
 EXPOSE 3000
 
+USER node
+
 CMD ["node", "index.js"]

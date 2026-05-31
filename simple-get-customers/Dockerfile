@@ -10,6 +10,8 @@ FROM scratch
 
 COPY --from=builder /app/simple-get-users /simple-get-users
 
+USER 65532:65532
+
 # in the compose stack, we pass the DNS for the app container as defined by traefik
 # directory to the process as an argument
 CMD ["/simple-get-users", "app.localhost", "5"]
