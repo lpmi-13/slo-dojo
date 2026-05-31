@@ -577,7 +577,7 @@
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "",
+  "timezone": "browser",
   "title": "SLO Dojo",
   "uid": "slo-dojo",
   "version": 1,

@@ -4,6 +4,8 @@ SLO Dojo is a hands-on workshop for practicing SLI/SLO investigation on a small 
 
 The stack starts in a known bad state every time. Learners inspect the live service, metrics, dashboard, and code, then make changes until the SLO breach alerts clear.
 
+![SLOs breached in the simulation](images/slos_breaches.png)
+
 ## Workshop Goal
 
 Resolve these three fixed SLO breaches:
@@ -34,7 +36,7 @@ Start from a clean seeded database:
 ```
 
 When the app is up, open `http://localhost:3000/alerts` and click **Allow notifications**.
-Then open Grafana in another tab. It is your first day on call for this service, but do not worry, surely nothing can go wrong...
+Then open Grafana in another tab at `http://localhost:4000`. It is your first day on call for this service, but don't worry, surely nothing can go wrong...
 
 After the workload has been running for about a minute, Prometheus sends the SLO breach alerts to Alertmanager, and Alertmanager sends them to the browser tab. Keep the tab open while you work so it can also notify you when alerts resolve.
 
