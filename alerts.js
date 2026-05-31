@@ -110,7 +110,7 @@ function alertPage(request, response) {
     <h1>SLO Dojo On-Call</h1>
     <p>
       Go ahead and click allow notifications, then open the Grafana tab.
-      It is your first day on call for this service, but do not worry,
+      It is your first day on call for this service, but don't worry,
       surely nothing can go wrong...
     </p>
     <button id="allow">Allow notifications</button>
