@@ -1,6 +1,6 @@
 module simple-insert-purchases
 
-go 1.19
+go 1.26
 
 require (
 	github.com/go-faker/faker/v4 v4.1.0

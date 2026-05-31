@@ -1,6 +1,6 @@
 module simple-insert-sellers
 
-go 1.19
+go 1.26
 
 require (
 	github.com/bxcodec/faker v2.0.1+incompatible

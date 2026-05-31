@@ -1,6 +1,6 @@
 module simple-insert-reviews
 
-go 1.19
+go 1.26
 
 require (
 	github.com/bxcodec/faker/v4 v4.0.0-beta.3

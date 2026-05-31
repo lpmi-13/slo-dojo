@@ -1,7 +1,7 @@
 services:
     db:
         container_name: postgres
-        image: postgres:14.1-alpine
+        image: postgres:18-alpine
         restart: unless-stopped
         environment:
             - POSTGRES_USER=postgres
@@ -23,7 +23,7 @@ services:
             timeout: 5s
             retries: 30
         volumes:
-            - postgres-data:/var/lib/postgresql/data
+            - postgres-data:/var/lib/postgresql
             - ./sql-scripts/create-database.sh:/docker-entrypoint-initdb.d/01-create-database.sh
             - ./sql-scripts/create-tables.sh:/docker-entrypoint-initdb.d/02-create-tables.sh
             - ./sql-scripts/seed-data.sql:/docker-entrypoint-initdb.d/03-seed-data.sql
@@ -81,7 +81,7 @@ services:
             - SEARCH_INTERVAL_MS=350
 
     traefik:
-        image: "traefik:v3.3"
+        image: "traefik:v3.7.1"
         container_name: "traefik"
         command:
             # - "--log.level=DEBUG"
@@ -123,7 +123,7 @@ services:
 
     prometheus:
         container_name: prometheus
-        image: prom/prometheus:v2.55.1
+        image: prom/prometheus:v3.5.3
         depends_on:
             - alertmanager
         volumes:
@@ -142,7 +142,7 @@ services:
 
     grafana:
         container_name: grafana
-        image: grafana/grafana-oss:8.5.14
+        image: grafana/grafana:13.0.1-security-01-ubuntu
         user: "472"
         depends_on:
             - prometheus
@@ -154,17 +154,15 @@ services:
         volumes:
             - grafana-data:/var/lib/grafana
             - ./grafana/provisioning:/etc/grafana/provisioning
-        environment:
-            - GF_INSTALL_PLUGINS=natel-discrete-panel,digiapulssi-breadcrumb-panel,yesoreyeram-boomtable-panel
         restart: unless-stopped
         deploy:
             resources:
                 limits:
                     cpus: "0.50"
-                    memory: 50M
+                    memory: 256M
                 reservations:
                     cpus: "0.25"
-                    memory: 20M
+                    memory: 64M
 
 volumes:
     postgres-data:
