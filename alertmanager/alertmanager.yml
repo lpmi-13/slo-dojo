@@ -1,0 +1,16 @@
+global:
+    resolve_timeout: 30s
+
+route:
+    receiver: local-browser
+    group_by:
+        - alertname
+    group_wait: 10s
+    group_interval: 10s
+    repeat_interval: 4h
+
+receivers:
+    - name: local-browser
+      webhook_configs:
+          - url: http://app:3000/alertmanager
+            send_resolved: true

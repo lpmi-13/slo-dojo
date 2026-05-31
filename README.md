@@ -33,6 +33,11 @@ Start from a clean seeded database:
 ./setup.sh
 ```
 
+When the app is up, open `http://localhost:3000/alerts` and click **Allow notifications**.
+Then open Grafana in another tab. It is your first day on call for this service, but do not worry, surely nothing can go wrong...
+
+After the workload has been running for about a minute, Prometheus sends the SLO breach alerts to Alertmanager, and Alertmanager sends them to the browser tab. Keep the tab open while you work so it can also notify you when alerts resolve.
+
 Or run the stack without deleting existing volumes:
 
 ```bash
@@ -43,6 +48,7 @@ Services:
 
 - App: `http://localhost:3000`
 - Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
 - Grafana: `http://localhost:4000`
 - Traefik dashboard: `http://localhost:8080`
 
@@ -60,6 +66,7 @@ The app image also runs a workload generator that continuously exercises the hom
 - `POST /referrals`
 - `PUT /referrals/:id/accept`
 - `GET /metrics`
+- `GET /alerts`
 
 Seeded learner login users use emails from `learner01@example.com` through `learner40@example.com`.
 The seeded password is `slo-dojo-password`.
@@ -73,6 +80,30 @@ npm run dojo:check
 ```
 
 This reports only whether each SLO is still breached or resolved, plus whether all workshop SLOs are resolved together.
+
+## Fixing The Service
+
+Learners are expected to edit the source code in this repository directly. This is intentional: the dojo is designed for an ephemeral local environment, and the repository can always be reset with version control after a run.
+
+After changing app code, redeploy the app container from the current local source tree:
+
+```bash
+./scripts/redeploy-app.sh
+```
+
+This rebuilds and restarts only the app service. The database, Prometheus, Alertmanager, Grafana, and workload keep running, so the alert state should update after the next metric window.
+
+Database changes that affect seeded schema files only apply to a fresh database volume. For live fixes such as adding an index, apply the change to the running database rather than resetting the whole stack.
+
+## Alerting
+
+Prometheus evaluates the SLO rules in `prometheus/rules.yml`, sends alerts to Alertmanager, and Alertmanager sends the default notification webhook to `POST /alertmanager` in the app.
+
+The default receiver is local browser notifications through `http://localhost:3000/alerts`. Browser notifications require the tab to stay open and require the learner to click **Allow notifications** once.
+
+External notification services are not enabled by default. An example config is available at `alertmanager/external-example.yml` with receiver blocks for Discord, Pushover, and PagerDuty. To use one, copy the relevant receiver and route into `alertmanager/alertmanager.yml`, add real service credentials, and restart Alertmanager.
+
+Alertmanager supports additional receivers, including email, Slack, Opsgenie, Telegram, and generic webhooks. See the official Alertmanager configuration docs: https://prometheus.io/docs/alerting/latest/configuration/
 
 ## Data
 

@@ -104,9 +104,28 @@ services:
                     cpus: "0.50"
                     memory: 100M
 
+    alertmanager:
+        container_name: alertmanager
+        image: prom/alertmanager:v0.32.1
+        depends_on:
+            app:
+                condition: service_healthy
+        command:
+            - "--config.file=/etc/alertmanager/alertmanager.yml"
+            - "--storage.path=/alertmanager"
+        ports:
+            - 9093:9093
+        volumes:
+            - ./alertmanager/:/etc/alertmanager/
+        networks:
+            - slo-dojo
+        restart: unless-stopped
+
     prometheus:
         container_name: prometheus
         image: prom/prometheus:v2.55.1
+        depends_on:
+            - alertmanager
         volumes:
             - ./prometheus/:/etc/prometheus/
             # - prometheus_data:/prometheus
